@@ -17,13 +17,20 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(session({
-    secret:"Our little secret.",
-    resave:false,
-    saveUninitialized:false
-}));
-
+    secret: 'secret',
+    saveUninitialized: true,
+    resave: false,
+    maxAge: 1000 * 60 * 15,
+    cookie:{
+        secure: true
+           }
+    }));
+    
 app.use(passport.initialize());
-app.use(passport.session());
+
+app.set('trust proxy', 1);
+
+
 
 mongoose.connect("mongodb+srv://bkdhanush:BKdhanush2501+@cluster0.eyocc.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser:true});
 
@@ -52,7 +59,7 @@ passport.serializeUser((user, done) => {
 passport.use(new GoogleStrategy({
     clientID: process.env.client_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/secrets",
+    callbackURL: process.env.CALLBACKURL,
     userProfileURL:"https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
