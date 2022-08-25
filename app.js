@@ -4,7 +4,7 @@ const express=require("express");
 const bodyParser=require("body-parser");
 const ejs=require("ejs");
 const mongoose=require("mongoose");
-const session=require('cookie-session');
+const session=require('express-session');
 const passport=require("passport");
 const passportLocalMongoose=require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
@@ -17,20 +17,13 @@ app.set('view engine','ejs');
 app.use(bodyParser.urlencoded({extended:true}));
 
 app.use(session({
-    secret: 'secret',
-    saveUninitialized: true,
-    resave: false,
-    maxAge: 1000 * 60 * 15,
-    cookie:{
-        secure: true
-           }
-    }));
+    secret:"Our little secret.",
+    resave:false,
+    saveUninitialized:false
+}));
 
 app.use(passport.initialize());
-
-app.set('trust proxy', 1);
-
-
+app.use(passport.session());
 
 mongoose.connect("mongodb+srv://bkdhanush:BKdhanush2501+@cluster0.eyocc.mongodb.net/?retryWrites=true&w=majority",{useNewUrlParser:true});
 
@@ -93,10 +86,10 @@ app.get("/register",function(req,res){
 });
 
 app.get('/logout', function(req, res){
-    req.logout(function(err) {
-      if (err) { return next(err); }
-      res.redirect('/');
+    req.logOut(function(err) {
+      if (err) { return err; }
     });
+    res.redirect('/');
   });
 
 app.get("/secrets",function(req,res){
